@@ -8,6 +8,7 @@ package miner.GUI;
 import PeerToPeer.Peer;
 import PeerToPeer.client.ImpClient;
 import common.HandlerFile;
+import common.HandlerLocation;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -25,12 +26,14 @@ public class InitialSetting extends javax.swing.JFrame {
     private String AddressWallet = "";
     private String Password = "";
     private HandlerFile hf = new HandlerFile();
+    private String CRP;
     /**
      * Creates new form InitialSetting
      */
     public InitialSetting(Peer myself, ArrayList<ImpClient> OtherPeers) {
         this.myself = myself;
         this.OtherPeers = OtherPeers;
+        this.CRP = HandlerLocation.getCurrentLocation();
         initComponents();
     }
 
@@ -238,6 +241,7 @@ public class InitialSetting extends javax.swing.JFrame {
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         // TODO add your handling code here:
+        // TODO add your handling code here:
         LocationSaveBlockchain = txtSaveLocationOfBlockchain.getText();
         AddressWallet = txtAddressWallet.getText();
         Password = String.valueOf(txtPassword.getPassword());
@@ -247,20 +251,20 @@ public class InitialSetting extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null,"Password và Confirm Password không giống nhau!","Lỗi!",JOptionPane.WARNING_MESSAGE);
         }
         else if(LocationSaveBlockchain.equals("")==false && AddressWallet.equals("")== false){
-            if(hf.createNewFolder(LocationSaveBlockchain+"\\EPC"))
-                if(hf.createNewFile(LocationSaveBlockchain+"\\EPC\\TopBlock.bin")){
+            if(hf.createNewFolder(LocationSaveBlockchain+"/EPC"))
+                if(hf.createNewFile(LocationSaveBlockchain+"/EPC/TopBlock.bin")){
                     
                 }
-                if(hf.createNewFile(LocationSaveBlockchain+"\\EPC\\Blocks.bin"))
-                    if(hf.createNewFolder("C:/ExpectedCoinMiner")){// tao foder ExpectedCoinMiner trong o C
-                        Config config = new Config(LocationSaveBlockchain+"\\EPC\\", AddressWallet, Password, false);
-                        if(hf.WriteFileConfig(config)){
-                            this.dispose();
-                            Process process = new Process(OtherPeers, LocationSaveBlockchain+"\\EPC\\");
-                            process.setVisible(true);
-                            process.dowloadBlockchain();
+                if(hf.createNewFile(LocationSaveBlockchain+"/EPC/Blocks.bin"))
+                {// tao foder ExpectedCoinMiner trong o C
+                    Config config = new Config(LocationSaveBlockchain+"/EPC/", AddressWallet, Password, false);
+                    if(hf.WriteFileConfig(config)){
+                        this.dispose();
+                        Process process = new Process(OtherPeers, LocationSaveBlockchain+"/EPC/");
+                        process.setVisible(true);
+                        process.dowloadBlockchain();
                             
-                        }
+                   }
                     }else{
 
                     }            
@@ -279,8 +283,8 @@ public class InitialSetting extends javax.swing.JFrame {
         if(re==JFileChooser.APPROVE_OPTION){
             String filename = file.getSelectedFile().getName();
             String dir = file.getCurrentDirectory().toString();
-            txtAddressWallet.setText(hf.readFile(dir+"\\"+filename));
-            System.out.println(dir+"\\"+filename);
+            txtAddressWallet.setText(hf.readFile(dir+"/"+filename));
+            System.out.println(dir+"/"+filename);
         }         
     }//GEN-LAST:event_btnReadFileAddressRewardActionPerformed
 

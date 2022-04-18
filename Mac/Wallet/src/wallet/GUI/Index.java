@@ -6,16 +6,19 @@
 package wallet.GUI;
 
 import PeerToPeer.client.ImpClient;
+import common.Calculator;
 import common.DigiSig;
 import common.HandlerFile;
 import common.HandlerLocation;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import mncoin.HandlerWallet;
 import mncoin.TransactionOutput;
 import org.json.JSONException;
@@ -27,9 +30,10 @@ import system.Config;
  */
 public class Index extends javax.swing.JFrame {
 
-     private ArrayList<ImpClient> OtherPeers;
+    private ArrayList<ImpClient> OtherPeers;
     private TransactionOutput[] myUTXO;
     private String CRP ;
+    private float currentBalance;
     /**
      * Creates new form Index
      */
@@ -41,9 +45,79 @@ public class Index extends javax.swing.JFrame {
         //jTabbedPane1.setSelectedIndex(1);
     }
     public void updateBalance(float lbAvaliables, float  lbPendings, float lbTotals){
+    this.currentBalance=lbTotals;
+    HandlerFile hf = new HandlerFile();
+    hf.ReadFileConfig();
     lbAvaliable.setText(String.valueOf(lbAvaliables));
     lbPending.setText(String.valueOf(lbPendings));
     lbTotal.setText(String.valueOf(lbTotals));
+    int k=0;
+    
+    
+    
+    // update history transaction
+    Vector vctData = new Vector();
+    Vector vctHeader = new Vector();
+    vctHeader.add("Date");
+    vctHeader.add("Type");
+    vctHeader.add("Address");
+    vctHeader.add("Amount");
+    vctHeader.add("Status");
+    k=0;
+   
+    for(int i = myUTXO.length-1;i>=0;i--){
+        if(k<10){
+            if(myUTXO[i].Status!=-1){
+                 Vector vctRow = new Vector();
+                vctRow.add(myUTXO[i].timeStamp);
+                if(myUTXO[i].isMine(hf.getConfig().getAddressWallet()))
+                    vctRow.add("Receive");
+                else
+                    vctRow.add("Send");
+                vctRow.add(Calculator.getNEndElementString(myUTXO[i].recipient, 20));
+                vctRow.add(Float.toString(myUTXO[i].value));
+                if(myUTXO[i].Status==1)
+                    vctRow.add("Complete");
+                else
+                    vctRow.add("Pending");
+                vctData.add(vctRow);
+             
+            }
+        }
+        k++;
+    }
+    TableRecentTrans.setModel(new DefaultTableModel(vctData,vctHeader));
+    //////
+    Vector vctData2 = new Vector();
+    Vector vctHeader2 = new Vector();
+    vctHeader2.add("Date");
+    vctHeader2.add("Type");
+    vctHeader2.add("Address");
+    vctHeader2.add("Amount");
+    k=0;
+    
+    for(int i = myUTXO.length-1;i>=0;i--){
+        if(k<20){
+            if(myUTXO[i].Status!=0){
+                Vector vctRow2 = new Vector();
+                vctRow2.add(myUTXO[i].timeStamp);
+                if(myUTXO[i].isMine(hf.getConfig().getAddressWallet()))
+                    vctRow2.add("Receive");
+                else
+                    vctRow2.add("Send");
+                vctRow2.add(Calculator.getNEndElementString(myUTXO[i].recipient, 20));
+                vctRow2.add(Float.toString(myUTXO[i].value));
+                if(myUTXO[i].Status==1)
+                    vctRow2.add("Complete");
+                else
+                    vctRow2.add("Pending");
+                vctData2.add(vctRow2);
+            }
+        }
+        k++;
+    }
+    tbHTrans.setModel(new DefaultTableModel(vctData2,vctHeader2));
+    
     }
 
     public void setMyUTXO(TransactionOutput[] myUTXO) {
@@ -78,6 +152,7 @@ public class Index extends javax.swing.JFrame {
         jScrollPane7 = new javax.swing.JScrollPane();
         textPrivateKeyInDialogSend = new javax.swing.JTextArea();
         btnChosePrivateKeyInDialogSend = new javax.swing.JButton();
+        btnClearInSig = new javax.swing.JButton();
         btnSendInDialogSend = new javax.swing.JToggleButton();
         btnCancelInDialogSend = new javax.swing.JToggleButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -91,8 +166,8 @@ public class Index extends javax.swing.JFrame {
         lbPending = new javax.swing.JLabel();
         lbTotal = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        TableRecentTrans = new javax.swing.JTable();
         jPanel2 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
@@ -100,7 +175,7 @@ public class Index extends javax.swing.JFrame {
         txtAddressReceiver = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
-        jSpinnerAmount = new javax.swing.JSpinner();
+        jSAmount = new javax.swing.JSpinner();
         jComboBox4 = new javax.swing.JComboBox<>();
         jTextField8 = new javax.swing.JTextField();
         btnChoseAddressToSend = new javax.swing.JButton();
@@ -126,7 +201,7 @@ public class Index extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
-        jTable3 = new javax.swing.JTable();
+        tbHTrans = new javax.swing.JTable();
         jComboBox5 = new javax.swing.JComboBox<>();
         jComboBox6 = new javax.swing.JComboBox<>();
         jTextField9 = new javax.swing.JTextField();
@@ -302,10 +377,18 @@ public class Index extends javax.swing.JFrame {
         jScrollPane7.setViewportView(textPrivateKeyInDialogSend);
 
         btnChosePrivateKeyInDialogSend.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        btnChosePrivateKeyInDialogSend.setText("Open");
+        btnChosePrivateKeyInDialogSend.setText("Browser");
         btnChosePrivateKeyInDialogSend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChosePrivateKeyInDialogSendActionPerformed(evt);
+            }
+        });
+
+        btnClearInSig.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
+        btnClearInSig.setText("Clear");
+        btnClearInSig.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearInSigActionPerformed(evt);
             }
         });
 
@@ -317,19 +400,25 @@ public class Index extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 587, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnChosePrivateKeyInDialogSend)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnChosePrivateKeyInDialogSend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnClearInSig, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
         jPanel12Layout.setVerticalGroup(
             jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel12Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel12Layout.createSequentialGroup()
+                .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel12Layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(btnChosePrivateKeyInDialogSend)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnClearInSig)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel12Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane7, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(jPanel12Layout.createSequentialGroup()
-                .addGap(53, 53, 53)
-                .addComponent(btnChosePrivateKeyInDialogSend)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         btnSendInDialogSend.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -419,12 +508,12 @@ public class Index extends javax.swing.JFrame {
                             .addComponent(jLabel6))
                         .addGap(18, 18, 18)
                         .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lbAvaliable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lbPending, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE))))
-                .addContainerGap(104, Short.MAX_VALUE))
+                            .addComponent(lbAvaliable, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                            .addComponent(lbPending, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 309, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 58, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -449,28 +538,31 @@ public class Index extends javax.swing.JFrame {
         jPanel7.setBackground(new java.awt.Color(204, 204, 204));
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Recent transactions", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 3, 12))); // NOI18N
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Resive from   31kCWpeYYiZJqemkap5zNkfyQmBC2YYwHd       109 EPC", "Resive from   31kCWpeYYiZJqemkap5zNkfyQmBC2YYwHd       52 EPC", "Send to          1Kr6QSydW9bFQG1mXiPNNu6WpJGmUa9i1g     30 EPC", "Send to          3KhxioHPSJwKJ57RZjeGo8fZtE5iTk2M4Q            91 EPC", " " };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane3.setViewportView(jList1);
+        TableRecentTrans.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Date", "Type", "Address", "Amount", "Status"
+            }
+        ));
+        jScrollPane8.setViewportView(TableRecentTrans);
 
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 569, Short.MAX_VALUE)
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3)
-                .addContainerGap())
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -479,10 +571,10 @@ public class Index extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -492,7 +584,7 @@ public class Index extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 125, Short.MAX_VALUE))
-                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, 363, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -537,7 +629,7 @@ public class Index extends javax.swing.JFrame {
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jTextField8)
                     .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(jSpinnerAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 540, Short.MAX_VALUE))
@@ -563,7 +655,7 @@ public class Index extends javax.swing.JFrame {
                 .addGap(21, 21, 21)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel16)
-                    .addComponent(jSpinnerAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(81, Short.MAX_VALUE))
         );
@@ -772,7 +864,7 @@ public class Index extends javax.swing.JFrame {
 
         jPanel4.setBackground(new java.awt.Color(148, 167, 212));
 
-        jTable3.setModel(new javax.swing.table.DefaultTableModel(
+        tbHTrans.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -783,13 +875,12 @@ public class Index extends javax.swing.JFrame {
                 "Date", "Type", "Address", "Amount"
             }
         ));
-        jScrollPane4.setViewportView(jTable3);
+        jScrollPane4.setViewportView(tbHTrans);
 
         jComboBox5.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", " " }));
 
         jComboBox6.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Send To", " " }));
 
-        jButton11.setBackground(new java.awt.Color(255, 255, 255));
         jButton11.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jButton11.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Asset/Icon/note.png"))); // NOI18N
         jButton11.setText("Export");
@@ -885,7 +976,7 @@ public class Index extends javax.swing.JFrame {
         // TODO add your handling code here:
         HandlerFile hf = new HandlerFile();
         if(!hf.ReadFileConfig()){
-            if(hf.createNewFolder(this.CRP)){
+            //if(hf.createNewFolder(this.CRP)){
                 if(hf.createNewFile(this.CRP+"/configWallet.bin")){
                     if(!textPublicKeyInDialog.getText().equals("")){
                         Config configWallet = new Config(textPublicKeyInDialog.getText(),"123",true);
@@ -895,7 +986,7 @@ public class Index extends javax.swing.JFrame {
                     }
                     
                 }
-            }
+           // }
             
         }else{
             Config configWallet = new Config(textPublicKeyInDialog.getText(),"123",true);
@@ -967,29 +1058,51 @@ public class Index extends javax.swing.JFrame {
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
         // TODO add your handling code here:
-        jDialog2.setVisible(true);
+        
+        float value = Float.parseFloat( jSAmount.getValue().toString());
+        if(!txtAddressReceiver.getText().isEmpty()){
+            
+            if(value>0&&value<=currentBalance){
+                jDialog2.setVisible(true);
+            } 
+           else{
+               JOptionPane.showMessageDialog(null,"Số tiền không hợp lệ vui lòng nhập lại!","Lỗi!",JOptionPane.WARNING_MESSAGE);
+           }           
+        }else{
+            JOptionPane.showMessageDialog(null,"Bạn chưa nhập địa chỉ ví người nhận!","Lỗi!",JOptionPane.WARNING_MESSAGE);
+        }
+
     }//GEN-LAST:event_btnSendActionPerformed
 
     private void btnSendInDialogSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendInDialogSendActionPerformed
         // TODO add your handling code here:
+        
         HandlerFile hf = new HandlerFile();
-        float value = Float.parseFloat( jSpinnerAmount.getValue().toString());
-        System.out.println(jSpinnerAmount.getValue());
+        float value = Float.parseFloat( jSAmount.getValue().toString());
+        System.out.println(jSAmount.getValue());
         if(hf.ReadFileConfig()){
-           HandlerWallet hw = new HandlerWallet(OtherPeers, myUTXO,hf.getConfig().getAddressWallet(),txtAddressReceiver.getText(),value); 
-           hw.initBeforeSendFunds();
-           if(hw.generateSignature(textPrivateKeyInDialogSend.getText())){
-               
-               try {
-                   hw.Send();
-                   jDialog2.dispose();
-               } catch (RemoteException ex) {
-                   System.out.println("Ko gui dc");
-                   Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-               } catch (JSONException ex) {
-                   Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
-               }
+           if(DigiSig.checkPrivateKey(hf.getConfig().getAddressWallet(), textPrivateKeyInDialogSend.getText())){
+                HandlerWallet hw = new HandlerWallet(OtherPeers, myUTXO,hf.getConfig().getAddressWallet(),txtAddressReceiver.getText(),value); 
+                hw.initBeforeSendFunds();
+                if(hw.generateSignature(textPrivateKeyInDialogSend.getText())){
+
+                    try {
+                        hw.Send();
+                        jDialog2.dispose();
+                        textPrivateKeyInDialogSend.setText("");
+                    } catch (RemoteException ex) {
+                        System.out.println("Ko gui dc");
+                        Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (JSONException ex) {
+                        Logger.getLogger(Index.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(null,"Khóa bí mật không chính xác, vui lòng nhập lại!","Lỗi!",JOptionPane.WARNING_MESSAGE);
+                }               
+           }else{
+               JOptionPane.showMessageDialog(null,"Khóa bí mật không chính xác, vui lòng nhập lại!","Lỗi!",JOptionPane.WARNING_MESSAGE);
            }
+
 
         }
         
@@ -1015,6 +1128,11 @@ public class Index extends javax.swing.JFrame {
             
         }        
     }//GEN-LAST:event_btnChosePrivateKeyInDialogSendActionPerformed
+
+    private void btnClearInSigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearInSigActionPerformed
+        // TODO add your handling code here:
+        textPrivateKeyInDialogSend.setText("");
+    }//GEN-LAST:event_btnClearInSigActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1053,10 +1171,12 @@ public class Index extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton BtnSavePrivateKeyInDialog;
+    private javax.swing.JTable TableRecentTrans;
     private javax.swing.JButton btnCancelInDialog;
     private javax.swing.JToggleButton btnCancelInDialogSend;
     private javax.swing.JButton btnChoseAddressToSend;
     private javax.swing.JButton btnChosePrivateKeyInDialogSend;
+    private javax.swing.JButton btnClearInSig;
     private javax.swing.JButton btnCreateNewWallet;
     private javax.swing.JButton btnCreateNewWalletInDialog;
     private javax.swing.JButton btnImportWalletInDialog;
@@ -1086,7 +1206,6 @@ public class Index extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu4;
@@ -1104,20 +1223,19 @@ public class Index extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JSpinner jSAmount;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinnerAmount;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTable jTable3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField8;
@@ -1125,6 +1243,7 @@ public class Index extends javax.swing.JFrame {
     private javax.swing.JLabel lbAvaliable;
     private javax.swing.JLabel lbPending;
     private javax.swing.JLabel lbTotal;
+    private javax.swing.JTable tbHTrans;
     private javax.swing.JTextArea textPrivateKeyInDialog;
     private javax.swing.JTextArea textPrivateKeyInDialogSend;
     private javax.swing.JTextArea textPublicKeyInDialog;

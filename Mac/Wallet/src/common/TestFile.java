@@ -5,6 +5,11 @@
  */
 package common;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+
 /**
  *
  * @author Admin
@@ -14,15 +19,21 @@ public class TestFile {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SocketException {
         // TODO code application logic here
-        HandlerFile  hf = new HandlerFile();
-//        hf.setUrlOut("d:/mydata.bin");
-//        hf.initWriter();
-    
-//        hf.setUrlIn("d:/mydata.bin");
-//        hf.Reader();
-          hf.createNewFile("d:/mydata3.bin");
-    }
-    
+        Enumeration e = NetworkInterface.getNetworkInterfaces();
+        while(e.hasMoreElements())
+        {
+            NetworkInterface n = (NetworkInterface) e.nextElement();
+            Enumeration ee = n.getInetAddresses();
+            while (ee.hasMoreElements())
+            {
+                InetAddress i = (InetAddress) ee.nextElement();
+                if(!i.getHostAddress().contains(":")){
+                    System.out.println(i.getHostAddress());
+                }
+                
+            }
+        }
+    } 
 }

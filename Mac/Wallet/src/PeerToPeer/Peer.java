@@ -9,6 +9,7 @@ import PeerToPeer.client.ImpClient;
 import PeerToPeer.client.PeerScanner;
 import PeerToPeer.server.ImpServer;
 import PeerToPeer.server.ServerDriver;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -28,7 +29,7 @@ public class Peer {
     private ArrayList<String> otherPeers;// danh sach chua ip cac peer trong mang
     private ServerDriver server; // server dung de lang nghe cac yeu cau tu nhung peer khac
     
-    public Peer(){
+    public Peer() throws SocketException{
         peers = new ArrayList<ImpClient>();
         otherPeers = new ArrayList<String>(); 
         server = new ServerDriver(peers, otherPeers);
@@ -39,6 +40,7 @@ public class Peer {
         } catch (InterruptedException ex) {
             Logger.getLogger(Peer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        System.out.println("scan");
         PeerScanner scannerPeer = new PeerScanner(peers, otherPeers);
         scannerPeer.scan();
         try {

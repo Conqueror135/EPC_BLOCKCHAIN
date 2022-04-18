@@ -9,6 +9,7 @@ import PeerToPeer.Peer;
 import PeerToPeer.client.ImpClient;
 import PeerToPeer.server.ImpServer;
 import common.HandlerFile;
+import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -25,7 +26,7 @@ public class Wallet {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SocketException {
         // TODO code application logic here
         Peer myself = new Peer(); // khoi tao va ket noi vao mang peer to peer
         ArrayList<ImpClient> OtherPeers = myself.getPeers(); // lay ket noi voi cac peer khac trong mang
@@ -34,6 +35,7 @@ public class Wallet {
         HandlerFile hf = new HandlerFile(); // khoi tao class xu ly file ( doc, ghi file và tao folder)
         Index indexGui = new Index(OtherPeers); 
         indexGui.setVisible(true);
+        
         while(true){
             float value = 0;
             float pending =0;
@@ -43,10 +45,17 @@ public class Wallet {
                         ArrayList<TransactionOutput> myOutput = otherPeer.getBalance(hf.getConfig().getAddressWallet());
                         indexGui.setMyUTXO(myOutput.toArray(new TransactionOutput[myOutput.size()]));
                         for(int i =0; i< myOutput.size();i++)
-                            if(myOutput.get(i).Status==1)
-                                value+= myOutput.get(i).value;
-                            else
-                                pending+=myOutput.get(i).value;
+                            if(myOutput.get(i).Status==1||myOutput.get(i).Status==-1){
+                                if(myOutput.get(i).isMine(hf.getConfig().getAddressWallet()))
+                                    value+= myOutput.get(i).value;                               
+                            }
+                            else if(myOutput.get(i).Status==0){
+                                if(myOutput.get(i).isMine(hf.getConfig().getAddressWallet())&&!myOutput.get(i).sender.equals(hf.getConfig().getAddressWallet()))
+                                    pending+=myOutput.get(i).value;
+                                else if(!myOutput.get(i).isMine(hf.getConfig().getAddressWallet()))
+                                    pending-=myOutput.get(i).value;
+                            }
+                                
                         break;
                         //    System.out.println(myOutput.get(i).toString());
                     } catch (RemoteException ex) {

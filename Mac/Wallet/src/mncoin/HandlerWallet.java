@@ -52,10 +52,13 @@ public class HandlerWallet {
     }
     public boolean initBeforeSendFunds(){
         for(TransactionOutput tran : myUTXO ){
-            inputs.add(new TransactionInput(tran.id));
-            TotalValue+= tran.value;
-            if(TotalValue>=value)
-                break;
+            if(tran.isMine(PubSender)&&tran.Status==1){
+                inputs.add(new TransactionInput(tran.id));
+                TotalValue+= tran.value;
+                if(TotalValue>=value)
+                    break;                
+            }
+
         }
         if(TotalValue<value) 
             return false;

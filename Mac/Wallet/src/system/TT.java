@@ -2,18 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package common;
+package system;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import common.HandlerLocation;
 
 /**
  *
  * @author duythang
  */
-public class HandlerLocation {
-    public static String getCurrentLocation(){
-        Path CRP = Paths.get("");
-        return CRP.toAbsolutePath().toString();
+public class TT {
+    public static void main(String[] args){
+        System.out.println(HandlerLocation.getCurrentLocation());
     }
 }

@@ -22,6 +22,8 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 /**
@@ -94,6 +96,29 @@ public class DigiSig {
 
     public String getPrivateKey() {
         return Base64.getEncoder().encodeToString(PrivateKey.getEncoded());
+    }
+    public static boolean checkPrivateKey(String publickey, String privatekey) {
+        try {
+            JSONObject isig = Sig(publickey, privatekey,"ThangThanThanh");
+            if(Verify(isig,"ThangThanThanh"))
+                return true;
+        } catch (NoSuchAlgorithmException ex) {
+            return false;
+        } catch (InvalidAlgorithmParameterException ex) {
+            return false;
+        } catch (InvalidKeyException ex) {
+            return false;
+        } catch (UnsupportedEncodingException ex) {
+            return false;
+        } catch (SignatureException ex) {
+            return false;
+        } catch (JSONException ex) {
+            return false;
+        } catch (InvalidKeySpecException ex) {
+            return false;
+        }
+        
+        return false;
     }
      public static void main(String[] args) throws JSONException{
          DigiSig dig = new DigiSig();

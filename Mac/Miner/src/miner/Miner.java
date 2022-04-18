@@ -11,6 +11,7 @@ import PeerToPeer.server.ImpServer;
 import common.HandlerFile;
 import entity.Block;
 import entity.Transaction;
+import java.net.SocketException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -29,7 +30,7 @@ public class Miner {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws NoSuchAlgorithmException {
+    public static void main(String[] args) throws NoSuchAlgorithmException, SocketException {
         // TODO code application logic here
         String systemWallet = "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAET2qhZqxcyFT3nFJ162oWx9W8NHu9xmBRrafdzOeUCLDrGqbxkWJJ+1ZKgFd24wLsQXyEthbWXeE1CKzL5KBUcw==";
         

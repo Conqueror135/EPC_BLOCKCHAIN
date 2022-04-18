@@ -22,19 +22,8 @@ public class GenesisBlock {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-       HandlerFile hf = new HandlerFile();
-//       if(hf.WriteFileConfig(new Config("D:\\EPC\\","MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEFopTPD5fYYcggdsjDgj8e1F7jC5hkjwW/DsRRztPjfjosuIykyYdxaLzxYFZdv11dvhF8s0orZFBOJ2kDW78zQ==","123",true))){
-//           System.out.println("ok");
-//       }else{
-//           System.out.println("no ok");
-//       }
-
-//        hf.ReadFileConfig();
-//        System.out.println(hf.getConfig().isIsBlockchainReady());
-
-
-        // test create genesisBlock..            ...
-        
+        HandlerFile hf = new HandlerFile();
+    
         Core core;
         core = new Core(6969696969.0, 5, 50.0, 4);
         Block a1 = new Block();
@@ -61,56 +50,5 @@ public class GenesisBlock {
        } else{
            System.out.println("Error write file TopBlock!");
        }
-       
-       
-       
-       
-       
-//         System.out.println("đ");
-//        if(hf.ReadFileConfig())
-//        if(hf.ReadFileBlockChain(hf.getConfig().getLocationSaveBlockchain()+"Blocks.bin")){
-//        //    Block[] b= hf.getBlocks();
-//    //    System.out.println("đ");
-//            System.out.println( hf.getBlocks()[0].getNonce());
-//        }
-
-
-//       if(hf.createNewFolder("d:/blockchain1"))
-//            if(hf.createNewFile("d:/blockchain1/mydata.bin")){
-//                Block b[]= {new Block("0","",java.time.LocalDateTime.now().toString(),"gdgsjdgs","10","gsgds",null,1,"thang",null)};
-//                hf.WriteFileBlockchain(b,"d:/blockchain1/mydata.bin" );
-//            }
-       
-//  try {
-//    //Bước 1: Tạo đối tượng luồng và liên kết nguồn dữ liệu
-//    FileInputStream fis = new FileInputStream("d:/blockchain1/mydata.bin");
-//    ObjectInputStream ois = new ObjectInputStream(fis);
-//    //Bước 2: Đọc dữ liệu
-//    Block[] b = (Block[]) ois.readObject();
-////    for(int i=0;i<b.length;i++){
-////        for(int j=0;j<sArr[i].trans.length;j++){
-////            System.out.println(sArr[i].trans[j].toString());
-////        }
-//        System.out.println(b[0].getMiner());
-////    }
-////    for(Block s : sArr){
-////      System.out.println(s.trans);
-////    }
-//    //Bước 3: Đóng luồng
-//    fis.close();
-//    ois.close();
-//  } catch (Exception ex) {
-//    System.out.println("Loi doc file: "+ex);
-// }       
-//       
-//       
-       
-       
-       
-       
-       
-       
-    //System.out.println(java.time.LocalDateTime.now()); 
     }
-// String //Height, String PreviousHeaderHash, String Timestamp, String MerkleRootHash, String Nonce, String HeaderHash, Transaction[] Trans, int Confirmations, String Miner, Core core   
 }

@@ -13,15 +13,8 @@ import java.nio.file.Paths;
  * @author Admin
  */
 public class HandlerLocation {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        Path currentRelativePath = Paths.get("");
-        String s = currentRelativePath.toAbsolutePath().toString();
-        System.out.println("Current relative path is: " + s);
+    public static String getCurrentLocation(){
+        Path CRP = Paths.get("");
+        return CRP.toAbsolutePath().toString();
     }
-    
 }

@@ -61,6 +61,9 @@ public class Calculator {
     public static String getStringFromKey(Key key){
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
+    public static String getNEndElementString(String s, int n){
+        return s.substring(s.length()-n-1, s.length()-1);
+    }
 //    public static void main(String[] args){
 //        ArrayList<Transaction> trans = new ArrayList<Transaction>();
 //        trans.add(new Transaction("Thang", "Than", 5.2, 0.02));
